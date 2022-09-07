@@ -4,6 +4,7 @@ from base.models import Room
 from .serializers import RoomSerializer
 
 
+
 @api_view(['GET'])
 def getRoutes(request):
     routes = [
