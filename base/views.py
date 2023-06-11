@@ -4,12 +4,13 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from .models import Message, Room, Topic , Message 
+from .models import Item, Message, Room, Topic , Message 
 from .forms import RoomForm ,UserForm
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.decorators import login_required
+import razorpay
 
 
 # rooms = [
@@ -76,7 +77,7 @@ def room(request,pk):
     room = Room.objects.get(id = pk)
     room_messages = room.message_set.all()
     participants = room.participants.all()
-    if request.method == 'POST':
+    if request.method == 'POST': 
        message = Message.objects.create(
            user = request.user,
            room = room,
@@ -174,3 +175,36 @@ def topicsPage(request):
 def activityPage(request):
     room_messages = Message.objects.all()
     return render(request,'base/activity.html',{'room_messsages':room_messages})
+
+@login_required(login_url='login')
+def video(request):
+    q = request.GET.get('q') if request.GET.get('q')!=None else ''
+    obj = Item.objects.filter(
+        Q(videotitle__icontains=q) |
+        Q(video__icontains=q) 
+        # Q(description__icontains=q)
+        )
+    
+    topics = Topic.objects.all()[0:5]
+    # room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
+    context = { 'topics': topics, 'obj':obj}
+    
+  
+    return render(request,'base/courses.html',context)
+
+client = razorpay.Client(auth=('rzp_test_lINBOTtTOEAiAR','rq76uXRs3pkubhB3GoLBi0A9'))
+@login_required(login_url='login')
+def subscription(request):
+    order_amount = 10000
+    order_currency = "INR"
+    payment_order = client.order.create(dict(amount = order_amount,currency = order_currency,payment_capture =1))
+    payment_order_id = payment_order['id']
+    context = {
+        'amount' : 10,
+        'api_key':'rzp_test_lINBOTtTOEAiAR',
+        'order_id':payment_order_id
+    }
+    return render(request,'base/contact.html',context)
+
+
+    

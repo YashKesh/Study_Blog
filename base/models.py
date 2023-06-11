@@ -1,6 +1,18 @@
+from asyncio.windows_events import NULL
+from contextlib import nullcontext
+from email.policy import default
+from operator import mod
+from unicodedata import name
 from django.db import models
 from django.contrib.auth.models import User
 
+
+# from django.db import models
+from embed_video.fields import EmbedVideoField
+
+class Item(models.Model):
+    videotitle = models.CharField(max_length=800,default=NULL)
+    video = EmbedVideoField()  # same like models.URLField()
 
 class Topic(models.Model):
     name = models.CharField(max_length=200)
