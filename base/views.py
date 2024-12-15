@@ -1,5 +1,5 @@
 from pydoc_data.topics import topics
-from turtle import pos
+# from turtle import pos
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
